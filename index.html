@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trouvez votre offre EDF</title>
     
+    <!-- Anti-cache pour forcer la mise à jour immédiate lors des tests -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <!-- Tailwind CSS pour le design -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -30,76 +35,74 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-dropdown {
-            animation: fadeInDown 0.2s ease-out forwards;
+            animation: fadeInDown 0.15s ease-out forwards;
         }
     </style>
 </head>
 <body class="bg-transparent m-0 p-0 overflow-hidden text-[#1C1917]">
 
-    <div id="papernest-app-wrapper" class="w-full flex flex-col items-center justify-center p-2">
+    <!-- Le conteneur principal a une min-height pour garantir que le scroll reste visible -->
+    <div id="papernest-app-wrapper" class="w-full flex flex-col items-center justify-center py-2 px-3 min-h-[400px]">
         
-        <!-- Top Icon -->
-        <div class="mb-6 bg-[#F6F5FF] p-3 rounded-xl inline-flex items-center justify-center">
-            <svg class="w-6 h-6 text-[#5A52FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14H4z"></path>
-            </svg>
-        </div>
-
-        <!-- Main Title -->
-        <h1 class="text-lg md:text-xl font-bold mb-8 text-center tracking-tight">
+        <!-- Main Title (sans le logo éclair) -->
+        <h1 class="text-xl sm:text-2xl font-bold mb-6 text-center tracking-tight">
             Trouvez votre offre EDF
         </h1>
 
-        <!-- Main Card -->
-        <div class="bg-white rounded-[24px] w-full max-w-[400px] border border-[#E7E5E4] p-6 md:p-8 shadow-sm">
+        <!-- Main Card : Beaucoup plus large (max-w-[850px]) -->
+        <div class="bg-white rounded-[24px] w-full max-w-[850px] border border-[#E7E5E4] p-5 sm:p-8 shadow-sm relative">
             
-            <p class="text-[#57534D] text-sm mb-8 text-center md:text-left">
+            <p class="text-[#57534D] text-[15px] mb-6 text-center sm:text-left leading-relaxed">
                 Consultez les détails de chaque offre et trouvez celle qui correspond à votre logement ou entreprise.
             </p>
 
-            <!-- Form Body -->
-            <div class="mb-6 relative" id="dropdown-container">
-                <label class="block text-sm font-semibold mb-3">
-                    Sélectionnez une offre
-                </label>
+            <label class="block text-sm font-bold mb-3 text-left text-[#1C1917]">
+                Sélectionnez une offre
+            </label>
+
+            <!-- Mise en page Desktop : Sélecteur ET Bouton sur la même ligne (flex-row) -->
+            <div class="flex flex-col sm:flex-row gap-4 mb-6">
                 
                 <!-- Custom Select Box -->
-                <div id="dropdown-trigger" class="w-full bg-white border border-[#E7E5E4] hover:border-[#D6D3D1] text-sm py-3 px-4 rounded-xl transition-all font-medium cursor-pointer flex items-center justify-between">
-                    <div class="flex items-center gap-3 truncate pr-4" id="selected-offer-display">
+                <div class="relative w-full sm:flex-1" id="dropdown-container">
+                    <div id="dropdown-trigger" class="w-full min-h-[52px] bg-white border border-[#E7E5E4] hover:border-[#D6D3D1] text-[15px] py-3 px-4 rounded-xl transition-all font-medium cursor-pointer flex items-center justify-between">
+                        <div class="flex items-center gap-3 truncate pr-4" id="selected-offer-display">
+                            <!-- Rempli par JS -->
+                        </div>
+                        <svg id="dropdown-chevron" class="w-4 h-4 text-[#79716B] flex-shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m6 9 6 6 6-6"></path>
+                        </svg>
+                    </div>
+
+                    <!-- Dropdown Options : Limité à 250px de haut pour scroller en interne -->
+                    <div id="dropdown-menu" class="hidden absolute z-50 w-full mt-2 bg-white border border-[#E7E5E4] rounded-xl shadow-lg max-h-[250px] overflow-y-auto custom-scrollbar py-2 animate-dropdown">
                         <!-- Rempli par JS -->
                     </div>
-                    <svg id="dropdown-chevron" class="w-4 h-4 text-[#79716B] flex-shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="m6 9 6 6 6-6"></path>
-                    </svg>
                 </div>
 
-                <!-- Dropdown Options (Caché par défaut) -->
-                <div id="dropdown-menu" class="hidden absolute z-50 w-full mt-2 bg-white border border-[#E7E5E4] rounded-xl shadow-lg max-h-[280px] overflow-y-auto custom-scrollbar py-2 animate-dropdown">
-                    <!-- Rempli par JS -->
-                </div>
+                <!-- CTA Button -->
+                <button id="cta-button" class="w-full sm:w-auto min-w-[220px] min-h-[52px] bg-[#5A52FF] hover:bg-[#443EC1] text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200">
+                    Découvrir l'offre
+                </button>
+
             </div>
 
-            <!-- Features / Reassurance -->
-            <div class="flex flex-col sm:flex-row gap-4 mb-8">
-                <div class="flex items-center text-sm text-[#57534D] bg-[#ECFDF5] p-3 rounded-lg flex-1 border border-[#A4F4CF]/30">
-                    <svg class="w-4 h-4 text-[#009966] mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Features / Reassurance (Côte à côte sur ordinateur) -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <!-- Badge 1 -->
+                <div class="flex items-center text-[15px] text-[#3F3F46] bg-[#F4FDF8] p-3.5 rounded-xl border border-[#A4F4CF]/40 sm:flex-1">
+                    <svg class="w-[18px] h-[18px] text-[#009966] mr-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2-1 4-2 7-2 2.5 0 4.5 1 6.5 2a1 1 0 0 1 1 1v7z"></path><path d="m9 12 2 2 4-4"></path>
                     </svg>
                     <span class="font-medium">Service 100% gratuit</span>
                 </div>
-                <div class="flex items-center text-sm text-[#57534D] bg-[#ECFDF5] p-3 rounded-lg flex-1 border border-[#A4F4CF]/30">
-                    <svg class="w-4 h-4 text-[#009966] mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Badge 2 -->
+                <div class="flex items-center text-[15px] text-[#3F3F46] bg-[#F4FDF8] p-3.5 rounded-xl border border-[#A4F4CF]/40 sm:flex-1">
+                    <svg class="w-[18px] h-[18px] text-[#009966] mr-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
                     </svg>
                     <span class="font-medium">Offres vertes dispos</span>
                 </div>
-            </div>
-
-            <!-- CTA Button -->
-            <div class="flex justify-center mt-4">
-                <button id="cta-button" class="w-full sm:w-auto min-w-[200px] bg-[#5A52FF] hover:bg-[#443EC1] text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200">
-                    Découvrir l'offre
-                </button>
             </div>
             
         </div>
@@ -151,8 +154,8 @@
 
         function updateDisplay() {
             selectedDisplay.innerHTML = `
-                ${getIconHtml(selectedOffer.type, "w-4 h-4 text-[#5A52FF] flex-shrink-0")}
-                <span class="truncate">${selectedOffer.name}</span>
+                ${getIconHtml(selectedOffer.type, "w-[18px] h-[18px] text-[#5A52FF] flex-shrink-0")}
+                <span class="truncate font-semibold text-[#1B194D]">${selectedOffer.name}</span>
             `;
         }
 
@@ -177,7 +180,7 @@
                 if (groupOffers.length === 0) continue;
                 
                 const groupDiv = document.createElement('div');
-                groupDiv.className = 'mb-2 last:mb-0';
+                groupDiv.className = 'mb-1 last:mb-0';
                 
                 const titleDiv = document.createElement('div');
                 titleDiv.className = 'px-4 py-2 text-[10px] font-bold text-[#A6A09B] uppercase tracking-wider bg-white sticky top-0 z-10';
@@ -191,8 +194,8 @@
                     
                     let innerHTML = `
                         <div class="flex items-center gap-3">
-                            ${getIconHtml(offer.type, `w-4 h-4 ${isSelected ? 'text-[#5A52FF]' : 'text-[#A6A09B]'}`)}
-                            <span class="text-sm ${isSelected ? 'text-[#1B194D] font-semibold' : 'text-[#57534D]'}">${offer.name}</span>
+                            ${getIconHtml(offer.type, `w-[18px] h-[18px] ${isSelected ? 'text-[#5A52FF]' : 'text-[#A6A09B]'}`)}
+                            <span class="text-[14px] ${isSelected ? 'text-[#1B194D] font-bold' : 'text-[#57534D]'}">${offer.name}</span>
                         </div>
                     `;
                     if (isSelected) innerHTML += getIconHtml('check', 'w-4 h-4 text-[#5A52FF]');
@@ -201,7 +204,7 @@
                     itemDiv.onclick = () => {
                         selectedOffer = offer;
                         updateDisplay();
-                        buildMenu(); // Reconstruire pour mettre à jour les couleurs (bg bleu et le check)
+                        buildMenu(); 
                         toggleDropdown();
                     };
                     groupDiv.appendChild(itemDiv);
@@ -210,7 +213,6 @@
             }
         }
 
-        // Event Listeners
         dropdownTrigger.addEventListener('click', toggleDropdown);
 
         document.addEventListener('mousedown', (e) => {
@@ -226,26 +228,25 @@
             }
         });
 
-        // Initialize
         updateDisplay();
         buildMenu();
 
-        // NOUVEAU : Observer pour l'ajustement dynamique de l'iframe
-        // L'iframe va s'agrandir quand on ouvre le menu déroulant !
+        // Gestion parfaite de la hauteur pour le CMS hôte
         const wrapper = document.getElementById('papernest-app-wrapper');
         if (wrapper) {
             const resizeObserver = new ResizeObserver(() => {
-                const newHeight = wrapper.offsetHeight + 10; // Petite marge
+                // S'assure de prendre en compte le menu déroulant si la hauteur globale ne suffit pas
+                const newHeight = Math.max(wrapper.offsetHeight, document.documentElement.scrollHeight);
                 window.parent.postMessage({ type: 'papernest-tool-resize', height: newHeight }, '*');
             });
             resizeObserver.observe(wrapper);
             
-            // Forcer un recalcul immédiat et après l'ouverture/fermeture du menu
+            // Forcer un update à l'ouverture du menu
             dropdownTrigger.addEventListener('click', () => {
                 setTimeout(() => {
-                    const height = wrapper.offsetHeight + 10;
+                    const height = Math.max(wrapper.offsetHeight, document.documentElement.scrollHeight);
                     window.parent.postMessage({ type: 'papernest-tool-resize', height: height }, '*');
-                }, 10);
+                }, 50);
             });
         }
     </script>
