@@ -1,254 +1,248 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trouvez votre offre EDF</title>
-    
-    <!-- Anti-cache pour forcer la mise à jour immédiate lors des tests -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    
-    <!-- Tailwind CSS pour le design -->
-    <script src="https://cdn.tailwindcss.com"></script>
+import React, { useState, useRef, useEffect } from 'react';
+import { 
+  Zap, 
+  ChevronDown, 
+  Flame, 
+  Building2, 
+  LayoutList, 
+  Check,
+  Info
+} from 'lucide-react';
 
-    <style>
-        /* Forcer le fond transparent pour s'intégrer au site hôte */
-        html, body {
-            background-color: transparent !important;
-        }
+const offers = [
+  { 
+    id: 'tarif-bleu',
+    name: "Tarif Bleu (Tarif Réglementé)", 
+    url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-bleu/",
+    type: "elec",
+    description: "Le tarif de l'électricité de référence en France, dont le prix est fixé et garanti par les pouvoirs publics (la CRE). Il offre une grande sécurité tarifaire et peut être souscrit en option Base ou Heures Creuses. Sans engagement, résiliable à tout moment sans frais."
+  },
+  { 
+    id: 'heures-creuses',
+    name: "Option Heures Creuses", 
+    url: "https://www.papernest.com/demarches-energie/edf/offres/heures-creuses/",
+    type: "elec",
+    description: "Bénéficiez d'un prix du kWh avantageux 8 heures par jour (souvent la nuit et/ou le midi). Idéal si vous possédez des équipements énergivores (ballon d'eau chaude, voiture électrique, pompe à chaleur) et que vous pouvez programmer votre consommation."
+  },
+  { 
+    id: 'tempo',
+    name: "Option Tempo", 
+    url: "https://www.papernest.com/demarches-energie/edf/offres/tempo/",
+    type: "elec",
+    description: "Le prix varie selon 3 couleurs de jours (Bleu, Blanc, Rouge) et les heures (Pleines/Creuses). Très économique 343 jours par an, mais demande une forte flexibilité pour réduire drastiquement sa consommation les 22 jours Rouges d'hiver. Parfait avec un chauffage alternatif (ex: bois)."
+  },
+  { 
+    id: 'ejp',
+    name: "Option EJP", 
+    url: "https://www.papernest.com/demarches-energie/edf/offres/ejp/",
+    type: "elec",
+    description: "Option historique offrant un tarif avantageux 343 jours par an. En contrepartie, le prix du kWh est nettement plus élevé pendant les 22 jours d'Effacement Jour de Pointe (EJP) répartis entre novembre et mars. (Note : n'est plus ouverte à la souscription pour les nouveaux clients)."
+  },
+  { 
+    id: 'vert-electrique',
+    name: "Vert Électrique", 
+    url: "https://www.papernest.com/demarches-energie/edf/offres/vert-electrique/",
+    type: "elec",
+    description: "Une offre d'électricité 100% verte certifiée par les Garanties d'Origine. Pour chaque kWh consommé, EDF injecte l'équivalent en énergie renouvelable (éolien, solaire, hydraulique) sur le réseau. Participez activement à la transition énergétique, sans engagement."
+  },
+  { 
+    id: 'zen',
+    name: "Zen Électrique", 
+    url: "https://www.papernest.com/demarches-energie/edf/offres/zen/",
+    type: "elec",
+    description: "Conçue pour ceux qui sont surtout chez eux en fin de semaine. Profitez d'un prix du kWh HT 30% moins cher le week-end et les jours fériés par rapport aux autres jours de la semaine. Une offre de marché idéale pour les résidences secondaires ou les travailleurs en semaine."
+  },
+  { 
+    id: 'tarif-jaune',
+    name: "Tarif Jaune (Professionnels)", 
+    url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-jaune/",
+    type: "pro",
+    description: "Anciennement tarif réglementé, c'est aujourd'hui une offre de marché sur-mesure destinée aux PME/PMI. Elle est adaptée aux entreprises dont la puissance de compteur requise est comprise entre 42 kVA et 250 kVA, avec un accompagnement dédié."
+  },
+  { 
+    id: 'tarif-vert',
+    name: "Tarif Vert (Professionnels)", 
+    url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-vert/",
+    type: "pro",
+    description: "Offre de marché pour les grands comptes et sites industriels. Conçue pour des puissances souscrites supérieures à 250 kVA (raccordement direct au réseau haute tension), avec une structure tarifaire optimisée pour les très gros volumes de consommation."
+  },
+  { 
+    id: 'gaz-optimise',
+    name: "Avantage Gaz Optimisé", 
+    url: "https://www.papernest.com/demarches-energie/edf/offres/gaz-optimise/",
+    type: "gaz",
+    description: "Un contrat de gaz naturel dont le prix du kWh HT est indexé à la baisse comme à la hausse sur le Prix Repère de Vente de Gaz (PRVG) publié mensuellement par la CRE. Une offre sans engagement de durée et résiliable sans frais à tout moment."
+  },
+  { 
+    id: 'gaz-2ans',
+    name: "Avantage Gaz 2 ans", 
+    url: "https://www.papernest.com/demarches-energie/edf/offres/gaz-2ans/",
+    type: "gaz",
+    description: "Sécurisez votre budget énergie avec un prix du kWh HT de gaz naturel bloqué pendant 2 ans. Vous êtes protégé contre les hausses éventuelles du marché, tout en conservant la liberté de résilier ou de changer d'offre sans frais à tout moment."
+  }
+];
 
-        /* Typographie Papernest */
-        body {
-            font-family: 'Avenir', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+// Regroupement des offres pour l'affichage
+const groupedOffers = {
+  "Offres Électricité": offers.filter(o => o.type === 'elec'),
+  "Offres Gaz": offers.filter(o => o.type === 'gaz'),
+  "Offres Professionnels": offers.filter(o => o.type === 'pro'),
+};
+
+const typeColors = {
+  elec: { text: '#5A52FF', bg: '#F6F5FF', border: '#CECCFF' }, // Palette Primary
+  gaz: { text: '#E17100', bg: '#FFFBEB', border: '#FEE685' },  // Palette Warning 
+  pro: { text: '#02C5AE', bg: '#F3FCFB', border: '#B4EEE7' },  // Palette Secondary
+  default: { text: '#A6A09B', bg: '#FAFAF9', border: '#E7E5E4' } // Palette Stone
+};
+
+// Fonction pour associer une icône Lucide au type d'offre
+const getIconForType = (type, className, color) => {
+  const style = color ? { color } : {};
+  switch(type) {
+    case 'elec': return <Zap className={className} style={style} />;
+    case 'gaz': return <Flame className={className} style={style} />;
+    case 'pro': return <Building2 className={className} style={style} />;
+    default: return <LayoutList className={className} style={style} />;
+  }
+};
+
+export default function PapernestTool() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState(null);
+  const dropdownRef = useRef(null);
+
+  // Fermer le menu déroulant si on clique en dehors
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleRedirect = () => {
+    if (selectedOffer && selectedOffer.url) {
+      window.open(selectedOffer.url, '_blank');
+    }
+  };
+
+  const activeColors = selectedOffer ? typeColors[selectedOffer.type] : typeColors.default;
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4 text-[#1C1917]" style={{ fontFamily: '"Avenir", sans-serif' }}>
+      
+      {/* Main Title */}
+      <h1 className="text-lg md:text-xl font-bold mb-8 text-center tracking-tight">
+        Trouvez votre offre EDF
+      </h1>
+
+      {/* Main Card */}
+      <div className="bg-white rounded-[24px] w-full max-w-4xl border border-[#E7E5E4] p-6 md:p-10 shadow-sm">
         
-        /* Personnalisation de l'ascenseur du menu déroulant */
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #E7E5E4; border-radius: 10px; }
-        
-        /* Animation du menu déroulant */
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-dropdown {
-            animation: fadeInDown 0.15s ease-out forwards;
-        }
-    </style>
-</head>
-<body class="bg-transparent m-0 p-0 overflow-hidden text-[#1C1917]">
+        <p className="text-[#57534D] text-sm md:text-base mb-8 text-center">
+          Consultez les détails de chaque offre et trouvez celle qui correspond à votre logement ou entreprise.
+        </p>
 
-    <!-- Le conteneur principal a une min-height pour garantir que le scroll reste visible -->
-    <div id="papernest-app-wrapper" class="w-full flex flex-col items-center justify-center py-2 px-3 min-h-[400px]">
-        
-        <!-- Main Title (sans le logo éclair) -->
-        <h1 class="text-xl sm:text-2xl font-bold mb-6 text-center tracking-tight">
-            Trouvez votre offre EDF
-        </h1>
+        {/* Form Body */}
+        <div className="mb-8" ref={dropdownRef}>
+          <label className="block text-sm font-semibold mb-3">
+            Sélectionnez une offre
+          </label>
+          
+          {/* Custom Select Box */}
+          <div className="relative">
+            <div 
+              className={`w-full bg-white border text-sm py-3 px-4 rounded-xl transition-all font-medium cursor-pointer flex items-center justify-between ${isOpen ? 'border-[#5A52FF] ring-1 ring-[#5A52FF]' : 'border-[#E7E5E4] hover:border-[#D6D3D1]'}`}
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              <div className="flex items-center gap-3 truncate pr-4">
+                {selectedOffer ? (
+                  <>
+                    {getIconForType(selectedOffer.type, "w-4 h-4 flex-shrink-0", activeColors.text)}
+                    <span className="truncate">{selectedOffer.name}</span>
+                  </>
+                ) : (
+                  <>
+                    <LayoutList className="w-4 h-4 text-[#A6A09B] flex-shrink-0" />
+                    <span className="text-[#79716B] truncate">Sélectionner une offre...</span>
+                  </>
+                )}
+              </div>
+              <ChevronDown className={`w-4 h-4 text-[#79716B] flex-shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+            </div>
 
-        <!-- Main Card : Beaucoup plus large (max-w-[850px]) -->
-        <div class="bg-white rounded-[24px] w-full max-w-[850px] border border-[#E7E5E4] p-5 sm:p-8 shadow-sm relative">
-            
-            <p class="text-[#57534D] text-[15px] mb-6 text-center sm:text-left leading-relaxed">
-                Consultez les détails de chaque offre et trouvez celle qui correspond à votre logement ou entreprise.
-            </p>
-
-            <label class="block text-sm font-bold mb-3 text-left text-[#1C1917]">
-                Sélectionnez une offre
-            </label>
-
-            <!-- Mise en page Desktop : Sélecteur ET Bouton sur la même ligne (flex-row) -->
-            <div class="flex flex-col sm:flex-row gap-4 mb-6">
-                
-                <!-- Custom Select Box -->
-                <div class="relative w-full sm:flex-1" id="dropdown-container">
-                    <div id="dropdown-trigger" class="w-full min-h-[52px] bg-white border border-[#E7E5E4] hover:border-[#D6D3D1] text-[15px] py-3 px-4 rounded-xl transition-all font-medium cursor-pointer flex items-center justify-between">
-                        <div class="flex items-center gap-3 truncate pr-4" id="selected-offer-display">
-                            <!-- Rempli par JS -->
+            {/* Dropdown Options */}
+            {isOpen && (
+              <div className="absolute z-50 w-full mt-2 bg-white border border-[#E7E5E4] rounded-xl shadow-lg max-h-[280px] overflow-y-auto py-2 animate-in fade-in slide-in-from-top-2">
+                {Object.entries(groupedOffers).map(([groupName, groupOffers]) => (
+                  <div key={groupName} className="mb-2 last:mb-0">
+                    <div className="px-4 py-2 text-[10px] font-bold text-[#A6A09B] uppercase tracking-wider bg-white sticky top-0 z-10">
+                      {groupName}
+                    </div>
+                    {groupOffers.map(offer => {
+                      const isSelected = selectedOffer?.id === offer.id;
+                      const offerTheme = typeColors[offer.type];
+                      return (
+                        <div
+                          key={offer.id}
+                          className={`flex items-center justify-between px-4 py-2.5 cursor-pointer transition-colors ${!isSelected && 'hover:bg-[#FAFAF9]'}`}
+                          style={isSelected ? { backgroundColor: offerTheme.bg } : {}}
+                          onClick={() => {
+                            setSelectedOffer(offer);
+                            setIsOpen(false);
+                          }}
+                        >
+                          <div className="flex items-center gap-3">
+                            {getIconForType(offer.type, "w-4 h-4", isSelected ? offerTheme.text : '#A6A09B')}
+                            <span className={`text-sm ${isSelected ? 'font-semibold text-[#1B194D]' : 'text-[#57534D]'}`}>
+                              {offer.name}
+                            </span>
+                          </div>
+                          {isSelected && <Check className="w-4 h-4" style={{ color: offerTheme.text }} />}
                         </div>
-                        <svg id="dropdown-chevron" class="w-4 h-4 text-[#79716B] flex-shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="m6 9 6 6 6-6"></path>
-                        </svg>
-                    </div>
-
-                    <!-- Dropdown Options : Limité à 250px de haut pour scroller en interne -->
-                    <div id="dropdown-menu" class="hidden absolute z-50 w-full mt-2 bg-white border border-[#E7E5E4] rounded-xl shadow-lg max-h-[250px] overflow-y-auto custom-scrollbar py-2 animate-dropdown">
-                        <!-- Rempli par JS -->
-                    </div>
-                </div>
-
-                <!-- CTA Button -->
-                <button id="cta-button" class="w-full sm:w-auto min-w-[220px] min-h-[52px] bg-[#5A52FF] hover:bg-[#443EC1] text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200">
-                    Découvrir l'offre
-                </button>
-
-            </div>
-
-            <!-- Features / Reassurance (Côte à côte sur ordinateur) -->
-            <div class="flex flex-col sm:flex-row gap-4">
-                <!-- Badge 1 -->
-                <div class="flex items-center text-[15px] text-[#3F3F46] bg-[#F4FDF8] p-3.5 rounded-xl border border-[#A4F4CF]/40 sm:flex-1">
-                    <svg class="w-[18px] h-[18px] text-[#009966] mr-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2-1 4-2 7-2 2.5 0 4.5 1 6.5 2a1 1 0 0 1 1 1v7z"></path><path d="m9 12 2 2 4-4"></path>
-                    </svg>
-                    <span class="font-medium">Service 100% gratuit</span>
-                </div>
-                <!-- Badge 2 -->
-                <div class="flex items-center text-[15px] text-[#3F3F46] bg-[#F4FDF8] p-3.5 rounded-xl border border-[#A4F4CF]/40 sm:flex-1">
-                    <svg class="w-[18px] h-[18px] text-[#009966] mr-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
-                    </svg>
-                    <span class="font-medium">Offres vertes dispos</span>
-                </div>
-            </div>
-            
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Offer Description Area */}
+        {selectedOffer && (
+          <div 
+            className="mb-8 p-4 rounded-xl border animate-in fade-in duration-300"
+            style={{ backgroundColor: activeColors.bg, borderColor: activeColors.border }}
+          >
+            <div className="flex items-start gap-3">
+              <Info className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: activeColors.text }} />
+              <div>
+                <h4 className="font-semibold text-[#1B194D] text-sm mb-1">{selectedOffer.name}</h4>
+                <p className="text-[#57534D] text-sm leading-relaxed">
+                  {selectedOffer.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* CTA Button */}
+        <div className="flex justify-center mt-4">
+          <ppn-cta 
+            call-text="Default call text"
+            onClick={handleRedirect}
+            disabled={!selectedOffer}
+            className={`w-full sm:w-auto min-w-[200px] flex justify-center ${!selectedOffer ? 'opacity-50 pointer-events-none grayscale' : 'cursor-pointer'}`}
+          >
+            Voir l'offre !
+          </ppn-cta>
+        </div>
+        
+      </div>
     </div>
-
-    <script>
-        const offers = [
-            { id: 'default', name: "Toutes les offres EDF (Général)", url: "https://www.papernest.com/demarches-energie/edf/offres/", type: "general" },
-            { id: 'tarif-bleu', name: "Tarif Bleu (Tarif Réglementé)", url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-bleu/", type: "elec" },
-            { id: 'heures-creuses', name: "Option Heures Creuses", url: "https://www.papernest.com/demarches-energie/edf/offres/heures-creuses/", type: "elec" },
-            { id: 'tempo', name: "Option Tempo", url: "https://www.papernest.com/demarches-energie/edf/offres/tempo/", type: "elec" },
-            { id: 'ejp', name: "Option EJP", url: "https://www.papernest.com/demarches-energie/edf/offres/ejp/", type: "elec" },
-            { id: 'vert-electrique', name: "Vert Électrique", url: "https://www.papernest.com/demarches-energie/edf/offres/vert-electrique/", type: "elec" },
-            { id: 'zen', name: "Zen Électrique", url: "https://www.papernest.com/demarches-energie/edf/offres/zen/", type: "elec" },
-            { id: 'tarif-jaune', name: "Tarif Jaune (Professionnels)", url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-jaune/", type: "pro" },
-            { id: 'tarif-vert', name: "Tarif Vert (Professionnels)", url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-vert/", type: "pro" },
-            { id: 'gaz-optimise', name: "Avantage Gaz Optimisé", url: "https://www.papernest.com/demarches-energie/edf/offres/gaz-optimise/", type: "gaz" },
-            { id: 'gaz-2ans', name: "Avantage Gaz 2 ans", url: "https://www.papernest.com/demarches-energie/edf/offres/gaz-2ans/", type: "gaz" }
-        ];
-
-        const groupedOffers = {
-            "Sélection générale": offers.filter(o => o.type === 'general'),
-            "Offres Électricité": offers.filter(o => o.type === 'elec'),
-            "Offres Gaz": offers.filter(o => o.type === 'gaz'),
-            "Offres Professionnels": offers.filter(o => o.type === 'pro'),
-        };
-
-        const icons = {
-            elec: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14H4z"></path></svg>`,
-            gaz: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>`,
-            pro: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg>`,
-            default: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect><path d="M14 4h7"></path><path d="M14 9h7"></path><path d="M14 15h7"></path><path d="M14 20h7"></path></svg>`,
-            check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>`
-        };
-
-        function getIconHtml(type, classes) {
-            const svgContent = icons[type] || icons.default;
-            return svgContent.replace('<svg', `<svg class="${classes}"`);
-        }
-
-        let isOpen = false;
-        let selectedOffer = offers[0];
-
-        const dropdownTrigger = document.getElementById('dropdown-trigger');
-        const dropdownMenu = document.getElementById('dropdown-menu');
-        const chevron = document.getElementById('dropdown-chevron');
-        const selectedDisplay = document.getElementById('selected-offer-display');
-        const ctaButton = document.getElementById('cta-button');
-
-        function updateDisplay() {
-            selectedDisplay.innerHTML = `
-                ${getIconHtml(selectedOffer.type, "w-[18px] h-[18px] text-[#5A52FF] flex-shrink-0")}
-                <span class="truncate font-semibold text-[#1B194D]">${selectedOffer.name}</span>
-            `;
-        }
-
-        function toggleDropdown() {
-            isOpen = !isOpen;
-            if (isOpen) {
-                dropdownMenu.classList.remove('hidden');
-                dropdownTrigger.classList.add('border-[#5A52FF]', 'ring-1', 'ring-[#5A52FF]');
-                dropdownTrigger.classList.remove('border-[#E7E5E4]', 'hover:border-[#D6D3D1]');
-                chevron.classList.add('rotate-180');
-            } else {
-                dropdownMenu.classList.add('hidden');
-                dropdownTrigger.classList.remove('border-[#5A52FF]', 'ring-1', 'ring-[#5A52FF]');
-                dropdownTrigger.classList.add('border-[#E7E5E4]', 'hover:border-[#D6D3D1]');
-                chevron.classList.remove('rotate-180');
-            }
-        }
-
-        function buildMenu() {
-            dropdownMenu.innerHTML = '';
-            for (const [groupName, groupOffers] of Object.entries(groupedOffers)) {
-                if (groupOffers.length === 0) continue;
-                
-                const groupDiv = document.createElement('div');
-                groupDiv.className = 'mb-1 last:mb-0';
-                
-                const titleDiv = document.createElement('div');
-                titleDiv.className = 'px-4 py-2 text-[10px] font-bold text-[#A6A09B] uppercase tracking-wider bg-white sticky top-0 z-10';
-                titleDiv.textContent = groupName;
-                groupDiv.appendChild(titleDiv);
-
-                groupOffers.forEach(offer => {
-                    const isSelected = selectedOffer.id === offer.id;
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = `flex items-center justify-between px-4 py-2.5 cursor-pointer transition-colors ${isSelected ? 'bg-[#F6F5FF]' : 'hover:bg-[#FAFAF9]'}`;
-                    
-                    let innerHTML = `
-                        <div class="flex items-center gap-3">
-                            ${getIconHtml(offer.type, `w-[18px] h-[18px] ${isSelected ? 'text-[#5A52FF]' : 'text-[#A6A09B]'}`)}
-                            <span class="text-[14px] ${isSelected ? 'text-[#1B194D] font-bold' : 'text-[#57534D]'}">${offer.name}</span>
-                        </div>
-                    `;
-                    if (isSelected) innerHTML += getIconHtml('check', 'w-4 h-4 text-[#5A52FF]');
-                    
-                    itemDiv.innerHTML = innerHTML;
-                    itemDiv.onclick = () => {
-                        selectedOffer = offer;
-                        updateDisplay();
-                        buildMenu(); 
-                        toggleDropdown();
-                    };
-                    groupDiv.appendChild(itemDiv);
-                });
-                dropdownMenu.appendChild(groupDiv);
-            }
-        }
-
-        dropdownTrigger.addEventListener('click', toggleDropdown);
-
-        document.addEventListener('mousedown', (e) => {
-            const container = document.getElementById('dropdown-container');
-            if (isOpen && !container.contains(e.target)) {
-                toggleDropdown();
-            }
-        });
-
-        ctaButton.addEventListener('click', () => {
-            if (selectedOffer && selectedOffer.url) {
-                window.open(selectedOffer.url, '_blank');
-            }
-        });
-
-        updateDisplay();
-        buildMenu();
-
-        // Gestion parfaite de la hauteur pour le CMS hôte
-        const wrapper = document.getElementById('papernest-app-wrapper');
-        if (wrapper) {
-            const resizeObserver = new ResizeObserver(() => {
-                // S'assure de prendre en compte le menu déroulant si la hauteur globale ne suffit pas
-                const newHeight = Math.max(wrapper.offsetHeight, document.documentElement.scrollHeight);
-                window.parent.postMessage({ type: 'papernest-tool-resize', height: newHeight }, '*');
-            });
-            resizeObserver.observe(wrapper);
-            
-            // Forcer un update à l'ouverture du menu
-            dropdownTrigger.addEventListener('click', () => {
-                setTimeout(() => {
-                    const height = Math.max(wrapper.offsetHeight, document.documentElement.scrollHeight);
-                    window.parent.postMessage({ type: 'papernest-tool-resize', height: height }, '*');
-                }, 50);
-            });
-        }
-    </script>
-</body>
-</html>
+  );
+}
