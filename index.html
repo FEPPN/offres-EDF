@@ -31,14 +31,14 @@
         
         <!-- Main Title -->
         <h1 class="text-lg md:text-xl font-bold mb-8 text-center tracking-tight">
-            Trouvez votre offre EDF
+            Trouvez votre offre d'électricité EDF
         </h1>
 
         <!-- Main Card -->
         <div class="bg-white rounded-[24px] w-full max-w-4xl border border-[#E7E5E4] p-6 md:p-10 shadow-sm mx-auto">
             
             <p class="text-[#57534D] text-sm md:text-base mb-8 text-left">
-                Consultez les détails de chaque offre et trouvez celle qui correspond à votre logement ou entreprise.
+                Consultez les détails de chaque offre d'électricité et trouvez celle qui correspond le mieux à votre logement et à vos habitudes de consommation.
             </p>
 
             <!-- Form Body -->
@@ -70,22 +70,31 @@
                     <span id="desc-icon-wrapper" class="flex-shrink-0 mt-0.5 w-5 h-5 flex items-center justify-center">
                         <i data-lucide="info" class="w-5 h-5"></i>
                     </span>
-                    <div>
-                        <h4 id="desc-title" class="font-semibold text-[#1B194D] text-sm mb-1"></h4>
-                        <p id="desc-text" class="text-[#57534D] text-sm leading-relaxed"></p>
+                    <div class="w-full">
+                        <h4 id="desc-title" class="font-semibold text-[#1B194D] text-base mb-3"></h4>
+                        
+                        <!-- Profil Type Box -->
+                        <div class="flex items-start gap-3 p-3 bg-white rounded-xl shadow-sm border border-white/50 mb-4">
+                            <div class="flex-shrink-0 bg-[#F6F5FF] p-1.5 rounded-lg text-[#5A52FF]">
+                                <i data-lucide="user-check" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold text-[#A6A09B] uppercase tracking-wider mb-0.5">Profil idéal</p>
+                                <p id="desc-profil-text" class="text-sm font-medium text-[#1B194D]"></p>
+                            </div>
+                        </div>
+
+                        <div id="desc-text" class="text-[#57534D] text-sm leading-relaxed"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- CTA Button (Utilisation de votre Web Component) -->
-            <div class="flex justify-center mt-4">
+            <!-- CTA Button (Utilisation stricte du composant fourni) -->
+            <div id="cta-container" class="flex justify-center mt-4 hide-element">
                 <ppn-cta 
                     id="cta-btn" 
-                    call-text="Default call text"
-                    class="w-full sm:w-auto min-w-[200px] flex justify-center opacity-50 pointer-events-none grayscale transition-all duration-200"
-                >
-                    Voir l'offre !
-                </ppn-cta>
+                    call-text="Voir l'offre !"
+                ></ppn-cta>
             </div>
             
         </div>
@@ -100,29 +109,63 @@
     }
 
     const offers = [
-        { id: 'tarif-bleu', name: "Tarif Bleu (Tarif Réglementé)", url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-bleu/", type: "elec", description: "Le tarif de l'électricité de référence en France, dont le prix est fixé et garanti par les pouvoirs publics (la CRE). Il offre une grande sécurité tarifaire et peut être souscrit en option Base ou Heures Creuses. Sans engagement, résiliable à tout moment sans frais." },
-        { id: 'heures-creuses', name: "Option Heures Creuses", url: "https://www.papernest.com/demarches-energie/edf/offres/heures-creuses/", type: "elec", description: "Bénéficiez d'un prix du kWh avantageux 8 heures par jour (souvent la nuit et/ou le midi). Idéal si vous possédez des équipements énergivores (ballon d'eau chaude, voiture électrique, pompe à chaleur) et que vous pouvez programmer votre consommation." },
-        { id: 'tempo', name: "Option Tempo", url: "https://www.papernest.com/demarches-energie/edf/offres/tempo/", type: "elec", description: "Le prix varie selon 3 couleurs de jours (Bleu, Blanc, Rouge) et les heures (Pleines/Creuses). Très économique 343 jours par an, mais demande une forte flexibilité pour réduire drastiquement sa consommation les 22 jours Rouges d'hiver. Parfait avec un chauffage alternatif (ex: bois)." },
-        { id: 'ejp', name: "Option EJP", url: "https://www.papernest.com/demarches-energie/edf/offres/ejp/", type: "elec", description: "Option historique offrant un tarif avantageux 343 jours par an. En contrepartie, le prix du kWh est nettement plus élevé pendant les 22 jours d'Effacement Jour de Pointe (EJP) répartis entre novembre et mars. (Note : n'est plus ouverte à la souscription pour les nouveaux clients)." },
-        { id: 'vert-electrique', name: "Vert Électrique", url: "https://www.papernest.com/demarches-energie/edf/offres/vert-electrique/", type: "elec", description: "Une offre d'électricité 100% verte certifiée par les Garanties d'Origine. Pour chaque kWh consommé, EDF injecte l'équivalent en énergie renouvelable (éolien, solaire, hydraulique) sur le réseau. Participez activement à la transition énergétique, sans engagement." },
-        { id: 'zen', name: "Zen Électrique", url: "https://www.papernest.com/demarches-energie/edf/offres/zen/", type: "elec", description: "Conçue pour ceux qui sont surtout chez eux en fin de semaine. Profitez d'un prix du kWh HT 30% moins cher le week-end et les jours fériés par rapport aux autres jours de la semaine. Une offre de marché idéale pour les résidences secondaires ou les travailleurs en semaine." },
-        { id: 'tarif-jaune', name: "Tarif Jaune (Professionnels)", url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-jaune/", type: "pro", description: "Anciennement tarif réglementé, c'est aujourd'hui une offre de marché sur-mesure destinée aux PME/PMI. Elle est adaptée aux entreprises dont la puissance de compteur requise est comprise entre 42 kVA et 250 kVA, avec un accompagnement dédié." },
-        { id: 'tarif-vert', name: "Tarif Vert (Professionnels)", url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-vert/", type: "pro", description: "Offre de marché pour les grands comptes et sites industriels. Conçue pour des puissances souscrites supérieures à 250 kVA (raccordement direct au réseau haute tension), avec une structure tarifaire optimisée pour les très gros volumes de consommation." },
-        { id: 'gaz-optimise', name: "Avantage Gaz Optimisé", url: "https://www.papernest.com/demarches-energie/edf/offres/gaz-optimise/", type: "gaz", description: "Un contrat de gaz naturel dont le prix du kWh HT est indexé à la baisse comme à la hausse sur le Prix Repère de Vente de Gaz (PRVG) publié mensuellement par la CRE. Une offre sans engagement de durée et résiliable sans frais à tout moment." },
-        { id: 'gaz-2ans', name: "Avantage Gaz 2 ans", url: "https://www.papernest.com/demarches-energie/edf/offres/gaz-2ans/", type: "gaz", description: "Sécurisez votre budget énergie avec un prix du kWh HT de gaz naturel bloqué pendant 2 ans. Vous êtes protégé contre les hausses éventuelles du marché, tout en conservant la liberté de résilier ou de changer d'offre sans frais à tout moment." }
+        { 
+            id: 'tarif-bleu', 
+            name: "Tarif Bleu (Tarif Réglementé)", 
+            url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-bleu/", 
+            type: "elec", 
+            profil: "Tous types de logements. Parfait pour les consommateurs qui privilégient la sécurité et la prévisibilité de leur budget énergie.",
+            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Le tarif réglementé dont le prix est fixé et garanti par les pouvoirs publics (la CRE).</li><li>Offre une grande sécurité tarifaire pour votre budget.</li><li>Disponible au choix en option Base ou Heures Creuses.</li><li>Sans engagement de durée, résiliable à tout moment et sans frais.</li></ul>" 
+        },
+        { 
+            id: 'heures-creuses', 
+            name: "Option Heures Creuses", 
+            url: "https://www.papernest.com/demarches-energie/edf/offres/heures-creuses/", 
+            type: "elec", 
+            profil: "Foyers équipés d'appareils programmables très énergivores (chauffe-eau électrique, lave-linge, sèche-linge) ou possédant un véhicule électrique.",
+            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Bénéficiez d'un prix du kWh réduit 8 heures par jour (généralement la nuit et/ou en milieu de journée).</li><li>Idéal pour rentabiliser vos grosses consommations électriques.</li><li>Permet de réaliser des économies en programmant et en décalant l'utilisation de vos appareils.</li></ul>" 
+        },
+        { 
+            id: 'tempo', 
+            name: "Option Tempo", 
+            url: "https://www.papernest.com/demarches-energie/edf/offres/tempo/", 
+            type: "elec", 
+            profil: "Foyers disposant d'un mode de chauffage alternatif (bois, poêle, insert) et capables de réduire drastiquement leur consommation électrique les jours de grand froid.",
+            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Le prix du kWh varie selon 3 couleurs de jours (Bleu, Blanc, Rouge) et les heures (Pleines/Creuses).</li><li>Tarif très économique 343 jours par an.</li><li>Demande une forte flexibilité pour réduire fortement sa consommation les 22 jours « Rouges » d'hiver.</li></ul>" 
+        },
+        { 
+            id: 'ejp', 
+            name: "Option EJP", 
+            url: "https://www.papernest.com/demarches-energie/edf/offres/ejp/", 
+            type: "elec", 
+            profil: "Anciens clients capables de fortement diminuer leur consommation 22 jours par an en hiver (offre historique non disponible à la souscription).",
+            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Option historique offrant un tarif très avantageux 343 jours par an.</li><li>En contrepartie, le prix du kWh est nettement plus élevé pendant les 22 jours d'Effacement Jour de Pointe (EJP) répartis entre novembre et mars.</li><li><em>Note importante : cette offre n'est plus ouverte à la souscription pour les nouveaux clients EDF.</em></li></ul>" 
+        },
+        { 
+            id: 'vert-electrique', 
+            name: "Vert Électrique", 
+            url: "https://www.papernest.com/demarches-energie/edf/offres/vert-electrique/", 
+            type: "elec", 
+            profil: "Consommateurs soucieux de leur impact environnemental et souhaitant soutenir financièrement la production d'énergies renouvelables.",
+            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Une offre d'électricité 100% verte certifiée par le mécanisme des Garanties d'Origine.</li><li>Pour chaque kWh que vous consommez, l'équivalent en énergie renouvelable (éolien, solaire, hydraulique) est injecté sur le réseau.</li><li>Vous participez activement à la transition énergétique, le tout sans engagement.</li></ul>" 
+        },
+        { 
+            id: 'zen', 
+            name: "Zen Électrique", 
+            url: "https://www.papernest.com/demarches-energie/edf/offres/zen/", 
+            type: "elec", 
+            profil: "Personnes actives souvent absentes la semaine, ou propriétaires de résidences secondaires consommant principalement le week-end.",
+            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Profitez d'un prix du kWh HT 30% moins cher le week-end et les jours fériés par rapport aux autres jours de la semaine.</li><li>Offre spécialement conçue pour ceux qui consomment majoritairement en fin de semaine.</li><li>Nécessite d'être équipé d'un compteur communicant Linky.</li></ul>" 
+        }
     ];
 
     const typeColors = {
         elec: { text: '#5A52FF', bg: '#F6F5FF', border: '#CECCFF', icon: 'zap' },
-        gaz: { text: '#E17100', bg: '#FFFBEB', border: '#FEE685', icon: 'flame' },
-        pro: { text: '#02C5AE', bg: '#F3FCFB', border: '#B4EEE7', icon: 'building-2' },
         default: { text: '#A6A09B', bg: '#FAFAF9', border: '#E7E5E4', icon: 'layout-list' }
     };
 
     const groupedOffers = {
-        "Offres Électricité": offers.filter(o => o.type === 'elec'),
-        "Offres Gaz": offers.filter(o => o.type === 'gaz'),
-        "Offres Professionnels": offers.filter(o => o.type === 'pro'),
+        "Offres Électricité": offers.filter(o => o.type === 'elec')
     };
 
     // DOM Elements
@@ -133,8 +176,10 @@
     const dropdownMenu = document.getElementById('dropdown-menu');
     const descContainer = document.getElementById('desc-container');
     const descTitle = document.getElementById('desc-title');
+    const descProfilText = document.getElementById('desc-profil-text');
     const descText = document.getElementById('desc-text');
     const descIconWrapper = document.getElementById('desc-icon-wrapper');
+    const ctaContainer = document.getElementById('cta-container');
     const ctaBtn = document.getElementById('cta-btn');
 
     let isOpen = false;
@@ -217,11 +262,12 @@
         selectBtn.classList.replace('border-[#E7E5E4]', 'border-[#5A52FF]');
         selectBtn.classList.add('ring-1', 'ring-[#5A52FF]');
 
-        // 2. Mettre à jour la description
+        // 2. Mettre à jour la description et le profil type
         descContainer.style.backgroundColor = theme.bg;
         descContainer.style.borderColor = theme.border;
         descTitle.innerText = offer.name;
-        descText.innerText = offer.description;
+        descProfilText.innerText = offer.profil;
+        descText.innerHTML = offer.description;
         descIconWrapper.innerHTML = `<i data-lucide="info" class="w-5 h-5" style="color: ${theme.text}"></i>`;
         
         descContainer.classList.remove('hide-element');
@@ -231,9 +277,8 @@
             descContainer.classList.add('opacity-100', 'translate-y-0');
         }, 10);
 
-        // 3. Activer le bouton CTA
-        ctaBtn.classList.remove('opacity-50', 'pointer-events-none', 'grayscale');
-        ctaBtn.classList.add('cursor-pointer');
+        // 3. Afficher le bouton CTA
+        ctaContainer.classList.remove('hide-element');
 
         // 4. Mettre à jour les couleurs dans la liste déroulante
         document.querySelectorAll('.offer-item').forEach(el => {
