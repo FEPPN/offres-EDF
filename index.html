@@ -47,15 +47,15 @@
                     Sélectionnez une offre
                 </label>
                 
-                <!-- Custom Select Box -->
-                <div id="select-btn" class="w-full bg-white border border-[#E7E5E4] hover:border-[#D6D3D1] text-sm py-3 px-4 rounded-xl transition-all font-medium cursor-pointer flex items-center justify-between">
+                <!-- Custom Select Box (Violet clair par défaut pour inciter à l'action) -->
+                <div id="select-btn" class="w-full bg-[#F6F5FF] border border-[#CECCFF] hover:border-[#5A52FF] text-sm py-3 px-4 rounded-xl transition-all font-medium cursor-pointer flex items-center justify-between">
                     <div class="flex items-center gap-3 truncate pr-4">
-                        <span id="select-icon" class="text-[#A6A09B] flex-shrink-0 flex items-center justify-center w-4 h-4">
+                        <span id="select-icon" class="text-[#5A52FF] flex-shrink-0 flex items-center justify-center w-4 h-4">
                             <i data-lucide="layout-list" class="w-4 h-4"></i>
                         </span>
-                        <span id="select-text" class="text-[#79716B] truncate">Sélectionner une offre...</span>
+                        <span id="select-text" class="text-[#5A52FF] font-semibold truncate">Sélectionnez une offre...</span>
                     </div>
-                    <i data-lucide="chevron-down" id="select-chevron" class="w-4 h-4 text-[#79716B] flex-shrink-0 transition-transform duration-200"></i>
+                    <i data-lucide="chevron-down" id="select-chevron" class="w-4 h-4 text-[#5A52FF] flex-shrink-0 transition-transform duration-200"></i>
                 </div>
 
                 <!-- Dropdown Options -->
@@ -89,12 +89,15 @@
                 </div>
             </div>
 
-            <!-- CTA Button (Utilisation stricte du composant fourni) -->
-            <div id="cta-container" class="flex justify-center mt-4 hide-element">
-                <ppn-cta 
+            <!-- CTA Button (Bouton HTML standard stylisé) -->
+            <div id="cta-container" class="flex justify-center mt-6">
+                <button 
                     id="cta-btn" 
-                    call-text="Voir l'offre !"
-                ></ppn-cta>
+                    class="w-full sm:w-auto min-w-[240px] bg-[#5A52FF] hover:bg-[#443EC1] text-white font-bold text-base py-3.5 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2 group opacity-40 pointer-events-none"
+                >
+                    <span>Voir l'offre !</span>
+                    <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                </button>
             </div>
             
         </div>
@@ -232,7 +235,7 @@
             dropdownMenu.classList.remove('hide-element');
             selectChevron.classList.add('rotate-180');
             if(!selectedOffer) {
-                selectBtn.classList.replace('border-[#E7E5E4]', 'border-[#5A52FF]');
+                selectBtn.classList.replace('border-[#CECCFF]', 'border-[#5A52FF]');
                 selectBtn.classList.add('ring-1', 'ring-[#5A52FF]');
             }
         } else {
@@ -245,7 +248,7 @@
         dropdownMenu.classList.add('hide-element');
         selectChevron.classList.remove('rotate-180');
         if(!selectedOffer) {
-            selectBtn.classList.replace('border-[#5A52FF]', 'border-[#E7E5E4]');
+            selectBtn.classList.replace('border-[#5A52FF]', 'border-[#CECCFF]');
             selectBtn.classList.remove('ring-1', 'ring-[#5A52FF]');
         }
     }
@@ -258,8 +261,12 @@
         selectText.innerText = offer.name;
         selectText.className = 'truncate text-[#1C1917] font-semibold';
         selectIcon.innerHTML = `<i data-lucide="${theme.icon}" class="w-4 h-4" style="color: ${theme.text}"></i>`;
+        selectChevron.classList.replace('text-[#5A52FF]', 'text-[#79716B]');
         
-        selectBtn.classList.replace('border-[#E7E5E4]', 'border-[#5A52FF]');
+        // On retire le fond violet clair de l'état "Action requise" pour passer à l'état "Sélectionné" (blanc)
+        selectBtn.classList.remove('bg-[#F6F5FF]', 'hover:border-[#5A52FF]');
+        selectBtn.classList.add('bg-white');
+        selectBtn.classList.replace('border-[#CECCFF]', 'border-[#5A52FF]');
         selectBtn.classList.add('ring-1', 'ring-[#5A52FF]');
 
         // 2. Mettre à jour la description et le profil type
@@ -277,8 +284,8 @@
             descContainer.classList.add('opacity-100', 'translate-y-0');
         }, 10);
 
-        // 3. Afficher le bouton CTA
-        ctaContainer.classList.remove('hide-element');
+        // 3. Afficher le bouton CTA (retire l'opacité)
+        ctaBtn.classList.remove('opacity-40', 'pointer-events-none');
 
         // 4. Mettre à jour les couleurs dans la liste déroulante
         document.querySelectorAll('.offer-item').forEach(el => {
