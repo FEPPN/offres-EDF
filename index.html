@@ -12,6 +12,7 @@
         font-family: 'Avenir', system-ui, -apple-system, sans-serif;
         background-color: transparent;
         width: 100%;
+        display: block;
     }
     #papernest-edf-tool .hide-element { 
         display: none !important; 
@@ -23,7 +24,6 @@
         background-color: #E7E5E4;
         border-radius: 10px;
     }
-    /* Animation fluide pour l'apparition de la description */
     #desc-container {
         transition: all 0.3s ease-out;
     }
@@ -46,7 +46,7 @@
             </p>
 
             <!-- Form Body -->
-            <div class="mb-8 relative" id="dropdown-container">
+            <div class="mb-8" id="dropdown-container">
                 <label class="block text-sm font-semibold mb-3">
                     Sélectionnez une offre
                 </label>
@@ -62,8 +62,8 @@
                     <i data-lucide="chevron-down" id="select-chevron" class="w-4 h-4 text-[#5A52FF] flex-shrink-0 transition-transform duration-200"></i>
                 </div>
 
-                <!-- Dropdown Options (Positionné en relatif pour pousser le contenu vers le bas) -->
-                <div id="dropdown-menu" class="hide-element w-full mt-2 bg-white border border-[#E7E5E4] rounded-xl shadow-lg max-h-[350px] overflow-y-auto py-2">
+                <!-- Dropdown Options (Positionné en relatif pour pousser le contenu) -->
+                <div id="dropdown-menu" class="hide-element relative w-full mt-2 bg-white border border-[#E7E5E4] rounded-xl shadow-md max-h-[400px] overflow-y-auto py-2 z-10">
                     <!-- Les options seront injectées ici par JavaScript -->
                 </div>
             </div>
@@ -113,62 +113,13 @@
     if (typeof lucide !== 'undefined') { lucide.createIcons(); }
 
     const offers = [
-        { 
-            id: 'tarif-bleu', 
-            name: "Tarif Bleu (Tarif Réglementé)", 
-            url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-bleu/", 
-            type: "elec", 
-            profil: "Tous types de logements. Parfait pour les consommateurs qui privilégient la sécurité et la prévisibilité de leur budget énergie.",
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Le tarif réglementé dont le prix est fixé et garanti par les pouvoirs publics (la CRE).</li><li>Offre une grande sécurité tarifaire pour votre budget.</li><li>Disponible au choix en option Base ou Heures Creuses.</li><li>Sans engagement de durée, résiliable à tout moment et sans frais.</li></ul>" 
-        },
-        { 
-            id: 'heures-creuses', 
-            name: "Option Heures Creuses", 
-            url: "https://www.papernest.com/demarches-energie/edf/offres/heures-creuses/", 
-            type: "elec", 
-            profil: "Foyers équipés d'appareils programmables énergivores (chauffe-eau électrique, lave-linge, sèche-linge) ou possédant un véhicule électrique.",
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Bénéficiez d'un prix du kWh réduit 8 heures par jour (généralement la nuit).</li><li>Idéal pour rentabiliser vos grosses consommations électriques.</li><li>Permet de réaliser des économies en programmant et en décalant l'utilisation de vos appareils.</li></ul>" 
-        },
-        { 
-            id: 'tempo', 
-            name: "Option Tempo", 
-            url: "https://www.papernest.com/demarches-energie/edf/offres/tempo/", 
-            type: "elec", 
-            profil: "Foyers disposant d'un mode de chauffage alternatif (bois, poêle, insert) et capables de réduire leur consommation lors des jours de grand froid.",
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Prix du kWh variable selon 3 couleurs de jours (Bleu, Blanc, Rouge) et les heures (Pleines/Creuses).</li><li>Tarif extrêmement avantageux 343 jours par an.</li><li>Demande une forte flexibilité pour réduire sa consommation les 22 jours « Rouges » d'hiver.</li></ul>" 
-        },
-        { 
-            id: 'vert-electrique', 
-            name: "Vert Électrique", 
-            url: "https://www.papernest.com/demarches-energie/edf/offres/vert-electrique/", 
-            type: "elec", 
-            profil: "Consommateurs soucieux de leur impact environnemental souhaitant soutenir la production d'énergies renouvelables.",
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Une offre d'électricité 100% verte certifiée par les Garanties d'Origine.</li><li>L'équivalent de votre consommation est injecté en énergie renouvelable sur le réseau par EDF.</li><li>Soutien direct à la transition énergétique, sans engagement.</li></ul>" 
-        },
-        { 
-            id: 'zen', 
-            name: "Zen Électrique", 
-            url: "https://www.papernest.com/demarches-energie/edf/offres/zen/", 
-            type: "elec", 
-            profil: "Personnes actives souvent absentes en semaine, ou propriétaires de résidences secondaires consommant principalement le week-end.",
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Prix du kWh HT 30% moins cher le week-end et les jours fériés.</li><li>Offre spécialement conçue pour les modes de vie décalés ou les loisirs.</li><li>Nécessite impérativement un compteur communicant Linky.</li></ul>" 
-        },
-        { 
-            id: 'tarif-jaune', 
-            name: "Tarif Jaune (Professionnels)", 
-            url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-jaune/", 
-            type: "pro", 
-            profil: "PME, PMI, commerces et collectivités dont la puissance de compteur requise est comprise entre 42 kVA et 250 kVA.",
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Offre de marché sur-mesure pour les entreprises à moyenne puissance.</li><li>Structure tarifaire adaptée aux besoins spécifiques de l'activité professionnelle.</li><li>Accompagnement dédié par des conseillers EDF Entreprises.</li></ul>" 
-        },
-        { 
-            id: 'tarif-vert', 
-            name: "Tarif Vert (Professionnels)", 
-            url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-vert/", 
-            type: "pro", 
-            profil: "Grandes entreprises et sites industriels nécessitant une puissance de raccordement supérieure à 250 kVA (Haute Tension).",
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Contrat d'énergie optimisé pour les très grands volumes de consommation.</li><li>Raccordement direct au réseau de transport ou de distribution haute tension.</li><li>Gestion spécialisée et structure tarifaire complexe adaptée aux processus industriels.</li></ul>" 
-        }
+        { id: 'tarif-bleu', name: "Tarif Bleu (Tarif Réglementé)", url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-bleu/", type: "elec", profil: "Tous types de logements. Parfait pour les consommateurs qui privilégient la sécurité et la prévisibilité de leur budget énergie.", description: "<ul class='list-disc pl-5 space-y-1.5'><li>Le tarif réglementé dont le prix est fixé et garanti par les pouvoirs publics (la CRE).</li><li>Offre une grande sécurité tarifaire pour votre budget.</li><li>Disponible au choix en option Base ou Heures Creuses.</li><li>Sans engagement de durée, résiliable à tout moment et sans frais.</li></ul>" },
+        { id: 'heures-creuses', name: "Option Heures Creuses", url: "https://www.papernest.com/demarches-energie/edf/offres/heures-creuses/", type: "elec", profil: "Foyers équipés d'appareils programmables énergivores (chauffe-eau électrique, lave-linge, sèche-linge) ou possédant un véhicule électrique.", description: "<ul class='list-disc pl-5 space-y-1.5'><li>Bénéficiez d'un prix du kWh réduit 8 heures par jour (généralement la nuit).</li><li>Idéal pour rentabiliser vos grosses consommations électriques.</li><li>Permet de réaliser des économies en programmant et en décalant l'utilisation de vos appareils.</li></ul>" },
+        { id: 'tempo', name: "Option Tempo", url: "https://www.papernest.com/demarches-energie/edf/offres/tempo/", type: "elec", profil: "Foyers disposant d'un mode de chauffage alternatif (bois, poêle, insert) et capables de réduire leur consommation lors des jours de grand froid.", description: "<ul class='list-disc pl-5 space-y-1.5'><li>Prix du kWh variable selon 3 couleurs de jours (Bleu, Blanc, Rouge) et les heures (Pleines/Creuses).</li><li>Tarif extrêmement avantageux 343 jours par an.</li><li>Demande une forte flexibilité pour réduire sa consommation les 22 jours « Rouges » d'hiver.</li></ul>" },
+        { id: 'vert-electrique', name: "Vert Électrique", url: "https://www.papernest.com/demarches-energie/edf/offres/vert-electrique/", type: "elec", profil: "Consommateurs soucieux de leur impact environnemental souhaitant soutenir la production d'énergies renouvelables.", description: "<ul class='list-disc pl-5 space-y-1.5'><li>Une offre d'électricité 100% verte certifiée par les Garanties d'Origine.</li><li>L'équivalent de votre consommation est injecté en énergie renouvelable sur le réseau par EDF.</li><li>Soutien direct à la transition énergétique, sans engagement.</li></ul>" },
+        { id: 'zen', name: "Zen Électrique", url: "https://www.papernest.com/demarches-energie/edf/offres/zen/", type: "elec", profil: "Personnes actives souvent absentes en semaine, ou propriétaires de résidences secondaires consommant principalement le week-end.", description: "<ul class='list-disc pl-5 space-y-1.5'><li>Prix du kWh HT 30% moins cher le week-end et les jours fériés.</li><li>Offre spécialement conçue pour les modes de vie décalés ou les loisirs.</li><li>Nécessite impérativement un compteur communicant Linky.</li></ul>" },
+        { id: 'tarif-jaune', name: "Tarif Jaune (Professionnels)", url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-jaune/", type: "pro", profil: "PME, PMI, commerces et collectivités dont la puissance de compteur requise est comprise entre 42 kVA et 250 kVA.", description: "<ul class='list-disc pl-5 space-y-1.5'><li>Offre de marché sur-mesure pour les entreprises à moyenne puissance.</li><li>Structure tarifaire adaptée aux besoins spécifiques de l'activité professionnelle.</li><li>Accompagnement dédié par des conseillers EDF Entreprises.</li></ul>" },
+        { id: 'tarif-vert', name: "Tarif Vert (Professionnels)", url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-vert/", type: "pro", profil: "Grandes entreprises et sites industriels nécessitant une puissance de raccordement supérieure à 250 kVA (Haute Tension).", description: "<ul class='list-disc pl-5 space-y-1.5'><li>Contrat d'énergie optimisé pour les très grands volumes de consommation.</li><li>Raccordement direct au réseau de transport ou de distribution haute tension.</li><li>Gestion spécialisée et structure tarifaire complexe adaptée aux processus industriels.</li></ul>" }
     ];
 
     const typeColors = {
@@ -198,10 +149,10 @@
     let isOpen = false;
     let selectedOffer = null;
 
-    // --- FONCTION DE RESIZE ROBUSTE ---
+    // --- FONCTION DE RESIZE AMELIOREE ---
     function sendResize() {
-        // On attend que le rendu soit fini
         requestAnimationFrame(() => {
+            // Utilise scrollHeight du body pour capter toute la hauteur réelle
             const height = document.body.scrollHeight;
             window.parent.postMessage({
                 type: 'papernest-tool-resize',
@@ -210,11 +161,9 @@
         });
     }
 
-    // Détection automatique de tout changement de taille
-    const resizeObserver = new ResizeObserver(() => {
-        sendResize();
-    });
-    resizeObserver.observe(document.body);
+    // Observer tout changement de taille dans le body (ouverture menu, desc, etc.)
+    const observer = new ResizeObserver(() => sendResize());
+    observer.observe(document.body);
 
     function renderDropdown() {
         dropdownMenu.innerHTML = '';
