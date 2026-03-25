@@ -12,8 +12,6 @@
         font-family: 'Avenir', system-ui, -apple-system, sans-serif;
         background-color: transparent;
         width: 100%;
-        /* On retire overflow: hidden pour permettre au menu de ne pas être coupé si besoin */
-        display: flow-root; 
     }
     #papernest-edf-tool .hide-element { 
         display: none !important; 
@@ -64,8 +62,8 @@
                     <i data-lucide="chevron-down" id="select-chevron" class="w-4 h-4 text-[#5A52FF] flex-shrink-0 transition-transform duration-200"></i>
                 </div>
 
-                <!-- Dropdown Options -->
-                <div id="dropdown-menu" class="hide-element absolute z-50 w-full mt-2 bg-white border border-[#E7E5E4] rounded-xl shadow-lg max-h-[280px] overflow-y-auto py-2">
+                <!-- Dropdown Options (Positionné en relatif pour pousser le contenu vers le bas) -->
+                <div id="dropdown-menu" class="hide-element w-full mt-2 bg-white border border-[#E7E5E4] rounded-xl shadow-lg max-h-[350px] overflow-y-auto py-2">
                     <!-- Les options seront injectées ici par JavaScript -->
                 </div>
             </div>
@@ -200,36 +198,23 @@
     let isOpen = false;
     let selectedOffer = null;
 
-    // --- FONCTION DE RESIZE AMÉLIORÉE ---
+    // --- FONCTION DE RESIZE ROBUSTE ---
     function sendResize() {
-        const root = document.getElementById('papernest-edf-tool');
-        const dropdown = document.getElementById('dropdown-menu');
-        
-        // On calcule la hauteur du contenu visible
-        let height = root.scrollHeight || root.offsetHeight;
-        
-        // Si le menu déroulant est ouvert, on doit s'assurer que sa hauteur est comptée
-        // car il est en position "absolute"
-        if (isOpen && dropdown) {
-            const dropdownRect = dropdown.getBoundingClientRect();
-            const rootRect = root.getBoundingClientRect();
-            const dropdownBottomRel = dropdownRect.bottom - rootRect.top;
-            if (dropdownBottomRel > height) {
-                height = dropdownBottomRel;
-            }
-        }
-
-        window.parent.postMessage({
-            type: 'papernest-tool-resize',
-            height: height + 20 // Marge de confort
-        }, '*');
+        // On attend que le rendu soit fini
+        requestAnimationFrame(() => {
+            const height = document.body.scrollHeight;
+            window.parent.postMessage({
+                type: 'papernest-tool-resize',
+                height: height
+            }, '*');
+        });
     }
 
-    // Utilisation d'un ResizeObserver pour détecter tout changement interne automatiquement
+    // Détection automatique de tout changement de taille
     const resizeObserver = new ResizeObserver(() => {
         sendResize();
     });
-    resizeObserver.observe(document.getElementById('papernest-edf-tool'));
+    resizeObserver.observe(document.body);
 
     function renderDropdown() {
         dropdownMenu.innerHTML = '';
@@ -295,6 +280,7 @@
         profilIconBg.style.color = theme.text;
         descText.innerHTML = offer.description;
         descIconWrapper.innerHTML = `<i data-lucide="info" class="w-5 h-5" style="color: ${theme.text}"></i>`;
+        
         descContainer.classList.remove('hide-element');
         setTimeout(() => descContainer.classList.remove('opacity-0', 'translate-y-2'), 10);
 
@@ -308,5 +294,6 @@
 
     window.onload = () => {
         renderDropdown();
+        sendResize();
     };
 </script>
