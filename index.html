@@ -12,7 +12,8 @@
         font-family: 'Avenir', system-ui, -apple-system, sans-serif;
         background-color: transparent;
         width: 100%;
-        overflow: hidden; /* Évite les doubles barres de défilement */
+        /* On retire overflow: hidden pour permettre au menu de ne pas être coupé si besoin */
+        display: flow-root; 
     }
     #papernest-edf-tool .hide-element { 
         display: none !important; 
@@ -23,6 +24,10 @@
     #papernest-edf-tool #dropdown-menu::-webkit-scrollbar-thumb {
         background-color: #E7E5E4;
         border-radius: 10px;
+    }
+    /* Animation fluide pour l'apparition de la description */
+    #desc-container {
+        transition: all 0.3s ease-out;
     }
 </style>
 
@@ -39,7 +44,7 @@
         <div class="bg-white rounded-[24px] w-full max-w-4xl border border-[#E7E5E4] p-6 md:p-10 shadow-sm mx-auto">
             
             <p class="text-[#57534D] text-sm md:text-base mb-8 text-left">
-                Consultez les détails de chaque offre d'électricité et trouvez celle qui correspond le mieux à votre logement et à vos habitudes de consommation.
+                Consultez les détails de chaque offre d'électricité, pour particuliers ou professionnels, et trouvez celle qui correspond le mieux à vos besoins.
             </p>
 
             <!-- Form Body -->
@@ -66,7 +71,7 @@
             </div>
 
             <!-- Offer Description Area -->
-            <div id="desc-container" class="hide-element mb-8 p-4 rounded-xl border transition-all duration-300 opacity-0 transform translate-y-2">
+            <div id="desc-container" class="hide-element mb-8 p-4 rounded-xl border opacity-0 transform translate-y-2">
                 <div class="flex items-start gap-3">
                     <span id="desc-icon-wrapper" class="flex-shrink-0 mt-0.5 w-5 h-5 flex items-center justify-center">
                         <i data-lucide="info" class="w-5 h-5"></i>
@@ -75,8 +80,8 @@
                         <h4 id="desc-title" class="font-semibold text-[#1B194D] text-base mb-3"></h4>
                         
                         <!-- Profil Type Box -->
-                        <div class="flex items-start gap-3 p-3 bg-white rounded-xl shadow-sm border border-white/50 mb-4">
-                            <div class="flex-shrink-0 bg-[#F6F5FF] p-1.5 rounded-lg text-[#5A52FF]">
+                        <div id="profil-box" class="flex items-start gap-3 p-3 bg-white rounded-xl shadow-sm border border-white/50 mb-4">
+                            <div id="profil-icon-bg" class="flex-shrink-0 p-1.5 rounded-lg">
                                 <i data-lucide="user-check" class="w-4 h-4"></i>
                             </div>
                             <div>
@@ -123,49 +128,62 @@
             name: "Option Heures Creuses", 
             url: "https://www.papernest.com/demarches-energie/edf/offres/heures-creuses/", 
             type: "elec", 
-            profil: "Foyers équipés d'appareils programmables très énergivores (chauffe-eau électrique, lave-linge, sèche-linge) ou possédant un véhicule électrique.",
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Bénéficiez d'un prix du kWh réduit 8 heures par jour (généralement la nuit et/ou en milieu de journée).</li><li>Idéal pour rentabiliser vos grosses consommations électriques.</li><li>Permet de réaliser des économies en programmant et en décalant l'utilisation de vos appareils.</li></ul>" 
+            profil: "Foyers équipés d'appareils programmables énergivores (chauffe-eau électrique, lave-linge, sèche-linge) ou possédant un véhicule électrique.",
+            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Bénéficiez d'un prix du kWh réduit 8 heures par jour (généralement la nuit).</li><li>Idéal pour rentabiliser vos grosses consommations électriques.</li><li>Permet de réaliser des économies en programmant et en décalant l'utilisation de vos appareils.</li></ul>" 
         },
         { 
             id: 'tempo', 
             name: "Option Tempo", 
             url: "https://www.papernest.com/demarches-energie/edf/offres/tempo/", 
             type: "elec", 
-            profil: "Foyers disposant d'un mode de chauffage alternatif (bois, poêle, insert) et capables de réduire drastiquement leur consommation électrique les jours de grand froid.",
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Le prix du kWh varie selon 3 couleurs de jours (Bleu, Blanc, Rouge) et les heures (Pleines/Creuses).</li><li>Tarif très économique 343 jours par an.</li><li>Demande une forte flexibilité pour réduire fortement sa consommation les 22 jours « Rouges » d'hiver.</li></ul>" 
-        },
-        { 
-            id: 'ejp', 
-            name: "Option EJP", 
-            url: "https://www.papernest.com/demarches-energie/edf/offres/ejp/", 
-            type: "elec", 
-            profil: "Anciens clients capables de fortement diminuer leur consommation 22 jours par an en hiver (offre historique non disponible à la souscription).",
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Option historique offrant un tarif très avantageux 343 jours par an.</li><li>En contrepartie, le prix du kWh est nettement plus élevé pendant les 22 jours d'Effacement Jour de Pointe (EJP) répartis entre novembre et mars.</li><li><em>Note importante : cette offre n'est plus ouverte à la souscription pour les nouveaux clients EDF.</em></li></ul>" 
+            profil: "Foyers disposant d'un mode de chauffage alternatif (bois, poêle, insert) et capables de réduire leur consommation lors des jours de grand froid.",
+            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Prix du kWh variable selon 3 couleurs de jours (Bleu, Blanc, Rouge) et les heures (Pleines/Creuses).</li><li>Tarif extrêmement avantageux 343 jours par an.</li><li>Demande une forte flexibilité pour réduire sa consommation les 22 jours « Rouges » d'hiver.</li></ul>" 
         },
         { 
             id: 'vert-electrique', 
             name: "Vert Électrique", 
             url: "https://www.papernest.com/demarches-energie/edf/offres/vert-electrique/", 
             type: "elec", 
-            profil: "Consommateurs soucieux de leur impact environnemental et souhaitant soutenir financièrement la production d'énergies renouvelables.",
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Une offre d'électricité 100% verte certifiée par le mécanisme des Garanties d'Origine.</li><li>Pour chaque kWh que vous consommez, l'équivalent en énergie renouvelable (éolien, solaire, hydraulique) est injecté sur le réseau.</li><li>Vous participez activement à la transition énergétique, le tout sans engagement.</li></ul>" 
+            profil: "Consommateurs soucieux de leur impact environnemental souhaitant soutenir la production d'énergies renouvelables.",
+            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Une offre d'électricité 100% verte certifiée par les Garanties d'Origine.</li><li>L'équivalent de votre consommation est injecté en énergie renouvelable sur le réseau par EDF.</li><li>Soutien direct à la transition énergétique, sans engagement.</li></ul>" 
         },
         { 
             id: 'zen', 
             name: "Zen Électrique", 
             url: "https://www.papernest.com/demarches-energie/edf/offres/zen/", 
             type: "elec", 
-            profil: "Personnes actives souvent absentes la semaine, ou propriétaires de résidences secondaires consommant principalement le week-end.",
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Profitez d'un prix du kWh HT 30% moins cher le week-end et les jours fériés par rapport aux autres jours de la semaine.</li><li>Offre spécialement conçue pour ceux qui consomment majoritairement en fin de semaine.</li><li>Nécessite d'être équipé d'un compteur communicant Linky.</li></ul>" 
+            profil: "Personnes actives souvent absentes en semaine, ou propriétaires de résidences secondaires consommant principalement le week-end.",
+            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Prix du kWh HT 30% moins cher le week-end et les jours fériés.</li><li>Offre spécialement conçue pour les modes de vie décalés ou les loisirs.</li><li>Nécessite impérativement un compteur communicant Linky.</li></ul>" 
+        },
+        { 
+            id: 'tarif-jaune', 
+            name: "Tarif Jaune (Professionnels)", 
+            url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-jaune/", 
+            type: "pro", 
+            profil: "PME, PMI, commerces et collectivités dont la puissance de compteur requise est comprise entre 42 kVA et 250 kVA.",
+            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Offre de marché sur-mesure pour les entreprises à moyenne puissance.</li><li>Structure tarifaire adaptée aux besoins spécifiques de l'activité professionnelle.</li><li>Accompagnement dédié par des conseillers EDF Entreprises.</li></ul>" 
+        },
+        { 
+            id: 'tarif-vert', 
+            name: "Tarif Vert (Professionnels)", 
+            url: "https://www.papernest.com/demarches-energie/edf/offres/tarif-vert/", 
+            type: "pro", 
+            profil: "Grandes entreprises et sites industriels nécessitant une puissance de raccordement supérieure à 250 kVA (Haute Tension).",
+            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Contrat d'énergie optimisé pour les très grands volumes de consommation.</li><li>Raccordement direct au réseau de transport ou de distribution haute tension.</li><li>Gestion spécialisée et structure tarifaire complexe adaptée aux processus industriels.</li></ul>" 
         }
     ];
 
     const typeColors = {
         elec: { text: '#5A52FF', bg: '#F6F5FF', border: '#CECCFF', icon: 'zap' },
+        pro: { text: '#02C5AE', bg: '#F3FCFB', border: '#B4EEE7', icon: 'building-2' },
         default: { text: '#A6A09B', bg: '#FAFAF9', border: '#E7E5E4', icon: 'layout-list' }
     };
 
-    // DOM Elements
+    const groupedOffers = {
+        "Offres Particuliers": offers.filter(o => o.type === 'elec'),
+        "Offres Professionnels": offers.filter(o => o.type === 'pro')
+    };
+
     const selectBtn = document.getElementById('select-btn');
     const selectText = document.getElementById('select-text');
     const selectIcon = document.getElementById('select-icon');
@@ -174,6 +192,7 @@
     const descContainer = document.getElementById('desc-container');
     const descTitle = document.getElementById('desc-title');
     const descProfilText = document.getElementById('desc-profil-text');
+    const profilIconBg = document.getElementById('profil-icon-bg');
     const descText = document.getElementById('desc-text');
     const descIconWrapper = document.getElementById('desc-icon-wrapper');
     const ctaBtn = document.getElementById('cta-btn');
@@ -181,34 +200,58 @@
     let isOpen = false;
     let selectedOffer = null;
 
-    // --- FONCTION DE RESIZE POUR IFRAME ---
+    // --- FONCTION DE RESIZE AMÉLIORÉE ---
     function sendResize() {
-        setTimeout(() => {
-            const height = document.getElementById('papernest-edf-tool').offsetHeight;
-            window.parent.postMessage({
-                type: 'papernest-tool-resize',
-                height: height + 40 // Ajout d'une marge de sécurité
-            }, '*');
-        }, 50); // Petit délai pour laisser le DOM se mettre à jour
+        const root = document.getElementById('papernest-edf-tool');
+        const dropdown = document.getElementById('dropdown-menu');
+        
+        // On calcule la hauteur du contenu visible
+        let height = root.scrollHeight || root.offsetHeight;
+        
+        // Si le menu déroulant est ouvert, on doit s'assurer que sa hauteur est comptée
+        // car il est en position "absolute"
+        if (isOpen && dropdown) {
+            const dropdownRect = dropdown.getBoundingClientRect();
+            const rootRect = root.getBoundingClientRect();
+            const dropdownBottomRel = dropdownRect.bottom - rootRect.top;
+            if (dropdownBottomRel > height) {
+                height = dropdownBottomRel;
+            }
+        }
+
+        window.parent.postMessage({
+            type: 'papernest-tool-resize',
+            height: height + 20 // Marge de confort
+        }, '*');
     }
 
-    function renderDropdown() {
-        const groupDiv = document.createElement('div');
-        groupDiv.className = 'mb-2 last:mb-0';
-        const header = document.createElement('div');
-        header.className = 'px-4 py-2 text-[10px] font-bold text-[#A6A09B] uppercase tracking-wider bg-white sticky top-0 z-10';
-        header.innerText = "Offres Électricité";
-        groupDiv.appendChild(header);
+    // Utilisation d'un ResizeObserver pour détecter tout changement interne automatiquement
+    const resizeObserver = new ResizeObserver(() => {
+        sendResize();
+    });
+    resizeObserver.observe(document.getElementById('papernest-edf-tool'));
 
-        offers.forEach(offer => {
-            const theme = typeColors[offer.type];
-            const item = document.createElement('div');
-            item.className = 'offer-item flex items-center justify-between px-4 py-2.5 cursor-pointer transition-colors hover:bg-[#FAFAF9]';
-            item.innerHTML = `<div class="flex items-center gap-3"><i data-lucide="${theme.icon}" class="w-4 h-4 item-icon text-[#A6A09B]"></i><span class="text-sm text-[#57534D] item-text">${offer.name}</span></div><i data-lucide="check" class="w-4 h-4 hide-element item-check" style="color: ${theme.text}"></i>`;
-            item.onclick = (e) => { e.stopPropagation(); selectOffer(offer, item); closeDropdown(); };
-            groupDiv.appendChild(item);
+    function renderDropdown() {
+        dropdownMenu.innerHTML = '';
+        Object.entries(groupedOffers).forEach(([groupName, groupOffers]) => {
+            if(groupOffers.length === 0) return;
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'mb-2 last:mb-0';
+            const header = document.createElement('div');
+            header.className = 'px-4 py-2 text-[10px] font-bold text-[#A6A09B] uppercase tracking-wider bg-white sticky top-0 z-10';
+            header.innerText = groupName;
+            groupDiv.appendChild(header);
+
+            groupOffers.forEach(offer => {
+                const theme = typeColors[offer.type];
+                const item = document.createElement('div');
+                item.className = 'offer-item flex items-center justify-between px-4 py-2.5 cursor-pointer transition-colors hover:bg-[#FAFAF9]';
+                item.innerHTML = `<div class="flex items-center gap-3"><i data-lucide="${theme.icon}" class="w-4 h-4 item-icon text-[#A6A09B]"></i><span class="text-sm text-[#57534D] item-text">${offer.name}</span></div><i data-lucide="check" class="w-4 h-4 hide-element item-check" style="color: ${theme.text}"></i>`;
+                item.onclick = (e) => { e.stopPropagation(); selectOffer(offer, item); closeDropdown(); };
+                groupDiv.appendChild(item);
+            });
+            dropdownMenu.appendChild(groupDiv);
         });
-        dropdownMenu.appendChild(groupDiv);
         lucide.createIcons();
     }
 
@@ -222,7 +265,6 @@
         } else {
             closeDropdown();
         }
-        sendResize();
     }
 
     function closeDropdown() {
@@ -233,7 +275,6 @@
             selectBtn.classList.replace('border-[#5A52FF]', 'border-[#CECCFF]');
             selectBtn.classList.remove('ring-1', 'ring-[#5A52FF]');
         }
-        sendResize();
     }
 
     function selectOffer(offer, itemElement) {
@@ -250,6 +291,8 @@
         descContainer.style.borderColor = theme.border;
         descTitle.innerText = offer.name;
         descProfilText.innerText = offer.profil;
+        profilIconBg.style.backgroundColor = theme.bg;
+        profilIconBg.style.color = theme.text;
         descText.innerHTML = offer.description;
         descIconWrapper.innerHTML = `<i data-lucide="info" class="w-5 h-5" style="color: ${theme.text}"></i>`;
         descContainer.classList.remove('hide-element');
@@ -257,7 +300,6 @@
 
         ctaBtn.classList.remove('opacity-40', 'pointer-events-none');
         lucide.createIcons();
-        sendResize();
     }
 
     selectBtn.onclick = (e) => { e.stopPropagation(); toggleDropdown(); };
@@ -266,6 +308,5 @@
 
     window.onload = () => {
         renderDropdown();
-        sendResize();
     };
 </script>
