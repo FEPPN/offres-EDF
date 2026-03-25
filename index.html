@@ -2,7 +2,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 
-<!-- 2. Styles encapsulés pour ne pas casser le reste de votre site -->
+<!-- 2. Styles encapsulés -->
 <style>
     @font-face {
         font-family: 'Avenir';
@@ -12,6 +12,7 @@
         font-family: 'Avenir', system-ui, -apple-system, sans-serif;
         background-color: transparent;
         width: 100%;
+        overflow: hidden; /* Évite les doubles barres de défilement */
     }
     #papernest-edf-tool .hide-element { 
         display: none !important; 
@@ -27,10 +28,10 @@
 
 <!-- 3. Structure de l'outil (HTML) -->
 <div id="papernest-edf-tool" class="text-[#1C1917] antialiased">
-    <div class="flex flex-col items-center justify-center py-6 w-full">
+    <div class="flex flex-col items-center justify-center py-2 w-full">
         
         <!-- Main Title -->
-        <h1 class="text-lg md:text-xl font-bold mb-8 text-center tracking-tight">
+        <h1 class="text-lg md:text-xl font-bold mb-6 text-center tracking-tight">
             Trouvez votre offre d'électricité EDF
         </h1>
 
@@ -47,7 +48,7 @@
                     Sélectionnez une offre
                 </label>
                 
-                <!-- Custom Select Box (Violet clair par défaut pour inciter à l'action) -->
+                <!-- Custom Select Box -->
                 <div id="select-btn" class="w-full bg-[#F6F5FF] border border-[#CECCFF] hover:border-[#5A52FF] text-sm py-3 px-4 rounded-xl transition-all font-medium cursor-pointer flex items-center justify-between">
                     <div class="flex items-center gap-3 truncate pr-4">
                         <span id="select-icon" class="text-[#5A52FF] flex-shrink-0 flex items-center justify-center w-4 h-4">
@@ -89,7 +90,7 @@
                 </div>
             </div>
 
-            <!-- CTA Button (Bouton HTML standard stylisé) -->
+            <!-- CTA Button -->
             <div id="cta-container" class="flex justify-center mt-6">
                 <button 
                     id="cta-btn" 
@@ -106,10 +107,7 @@
 
 <!-- 4. Logique Interactive (JavaScript) -->
 <script>
-    // Initialisation des icônes Lucide
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
+    if (typeof lucide !== 'undefined') { lucide.createIcons(); }
 
     const offers = [
         { 
@@ -167,10 +165,6 @@
         default: { text: '#A6A09B', bg: '#FAFAF9', border: '#E7E5E4', icon: 'layout-list' }
     };
 
-    const groupedOffers = {
-        "Offres Électricité": offers.filter(o => o.type === 'elec')
-    };
-
     // DOM Elements
     const selectBtn = document.getElementById('select-btn');
     const selectText = document.getElementById('select-text');
@@ -182,51 +176,40 @@
     const descProfilText = document.getElementById('desc-profil-text');
     const descText = document.getElementById('desc-text');
     const descIconWrapper = document.getElementById('desc-icon-wrapper');
-    const ctaContainer = document.getElementById('cta-container');
     const ctaBtn = document.getElementById('cta-btn');
 
     let isOpen = false;
     let selectedOffer = null;
 
-    // Fonction pour peupler le menu déroulant
+    // --- FONCTION DE RESIZE POUR IFRAME ---
+    function sendResize() {
+        setTimeout(() => {
+            const height = document.getElementById('papernest-edf-tool').offsetHeight;
+            window.parent.postMessage({
+                type: 'papernest-tool-resize',
+                height: height + 40 // Ajout d'une marge de sécurité
+            }, '*');
+        }, 50); // Petit délai pour laisser le DOM se mettre à jour
+    }
+
     function renderDropdown() {
-        Object.entries(groupedOffers).forEach(([groupName, groupOffers]) => {
-            const groupDiv = document.createElement('div');
-            groupDiv.className = 'mb-2 last:mb-0';
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'mb-2 last:mb-0';
+        const header = document.createElement('div');
+        header.className = 'px-4 py-2 text-[10px] font-bold text-[#A6A09B] uppercase tracking-wider bg-white sticky top-0 z-10';
+        header.innerText = "Offres Électricité";
+        groupDiv.appendChild(header);
 
-            const header = document.createElement('div');
-            header.className = 'px-4 py-2 text-[10px] font-bold text-[#A6A09B] uppercase tracking-wider bg-white sticky top-0 z-10';
-            header.innerText = groupName;
-            groupDiv.appendChild(header);
-
-            groupOffers.forEach(offer => {
-                const theme = typeColors[offer.type];
-                const item = document.createElement('div');
-                item.className = 'offer-item flex items-center justify-between px-4 py-2.5 cursor-pointer transition-colors hover:bg-[#FAFAF9]';
-                item.dataset.id = offer.id;
-                
-                item.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="${theme.icon}" class="w-4 h-4 item-icon text-[#A6A09B]"></i>
-                        <span class="text-sm text-[#57534D] item-text">${offer.name}</span>
-                    </div>
-                    <i data-lucide="check" class="w-4 h-4 hide-element item-check" style="color: ${theme.text}"></i>
-                `;
-
-                item.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    selectOffer(offer, item);
-                    closeDropdown();
-                });
-
-                groupDiv.appendChild(item);
-            });
-            dropdownMenu.appendChild(groupDiv);
+        offers.forEach(offer => {
+            const theme = typeColors[offer.type];
+            const item = document.createElement('div');
+            item.className = 'offer-item flex items-center justify-between px-4 py-2.5 cursor-pointer transition-colors hover:bg-[#FAFAF9]';
+            item.innerHTML = `<div class="flex items-center gap-3"><i data-lucide="${theme.icon}" class="w-4 h-4 item-icon text-[#A6A09B]"></i><span class="text-sm text-[#57534D] item-text">${offer.name}</span></div><i data-lucide="check" class="w-4 h-4 hide-element item-check" style="color: ${theme.text}"></i>`;
+            item.onclick = (e) => { e.stopPropagation(); selectOffer(offer, item); closeDropdown(); };
+            groupDiv.appendChild(item);
         });
-        
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
+        dropdownMenu.appendChild(groupDiv);
+        lucide.createIcons();
     }
 
     function toggleDropdown() {
@@ -234,13 +217,12 @@
         if (isOpen) {
             dropdownMenu.classList.remove('hide-element');
             selectChevron.classList.add('rotate-180');
-            if(!selectedOffer) {
-                selectBtn.classList.replace('border-[#CECCFF]', 'border-[#5A52FF]');
-                selectBtn.classList.add('ring-1', 'ring-[#5A52FF]');
-            }
+            selectBtn.classList.replace('border-[#CECCFF]', 'border-[#5A52FF]');
+            selectBtn.classList.add('ring-1', 'ring-[#5A52FF]');
         } else {
             closeDropdown();
         }
+        sendResize();
     }
 
     function closeDropdown() {
@@ -251,85 +233,39 @@
             selectBtn.classList.replace('border-[#5A52FF]', 'border-[#CECCFF]');
             selectBtn.classList.remove('ring-1', 'ring-[#5A52FF]');
         }
+        sendResize();
     }
 
     function selectOffer(offer, itemElement) {
         selectedOffer = offer;
         const theme = typeColors[offer.type];
-
-        // 1. Mettre à jour le bouton Select
         selectText.innerText = offer.name;
         selectText.className = 'truncate text-[#1C1917] font-semibold';
         selectIcon.innerHTML = `<i data-lucide="${theme.icon}" class="w-4 h-4" style="color: ${theme.text}"></i>`;
-        selectChevron.classList.replace('text-[#5A52FF]', 'text-[#79716B]');
-        
-        // On retire le fond violet clair de l'état "Action requise" pour passer à l'état "Sélectionné" (blanc)
         selectBtn.classList.remove('bg-[#F6F5FF]', 'hover:border-[#5A52FF]');
-        selectBtn.classList.add('bg-white');
-        selectBtn.classList.replace('border-[#CECCFF]', 'border-[#5A52FF]');
-        selectBtn.classList.add('ring-1', 'ring-[#5A52FF]');
+        selectBtn.classList.add('bg-white', 'border-[#5A52FF]', 'ring-1', 'ring-[#5A52FF]');
+        selectChevron.classList.replace('text-[#5A52FF]', 'text-[#79716B]');
 
-        // 2. Mettre à jour la description et le profil type
         descContainer.style.backgroundColor = theme.bg;
         descContainer.style.borderColor = theme.border;
         descTitle.innerText = offer.name;
         descProfilText.innerText = offer.profil;
         descText.innerHTML = offer.description;
         descIconWrapper.innerHTML = `<i data-lucide="info" class="w-5 h-5" style="color: ${theme.text}"></i>`;
-        
         descContainer.classList.remove('hide-element');
-        // Animation fade in
-        setTimeout(() => {
-            descContainer.classList.remove('opacity-0', 'translate-y-2');
-            descContainer.classList.add('opacity-100', 'translate-y-0');
-        }, 10);
+        setTimeout(() => descContainer.classList.remove('opacity-0', 'translate-y-2'), 10);
 
-        // 3. Afficher le bouton CTA (retire l'opacité)
         ctaBtn.classList.remove('opacity-40', 'pointer-events-none');
-
-        // 4. Mettre à jour les couleurs dans la liste déroulante
-        document.querySelectorAll('.offer-item').forEach(el => {
-            el.style.backgroundColor = '';
-            el.classList.add('hover:bg-[#FAFAF9]');
-            el.querySelector('.item-text').classList.replace('text-[#1B194D]', 'text-[#57534D]');
-            el.querySelector('.item-text').classList.remove('font-semibold');
-            el.querySelector('.item-icon').style.color = '#A6A09B';
-            el.querySelector('.item-check').classList.add('hide-element');
-        });
-
-        if (itemElement) {
-            itemElement.style.backgroundColor = theme.bg;
-            itemElement.classList.remove('hover:bg-[#FAFAF9]');
-            itemElement.querySelector('.item-text').classList.replace('text-[#57534D]', 'text-[#1B194D]');
-            itemElement.querySelector('.item-text').classList.add('font-semibold');
-            itemElement.querySelector('.item-icon').style.color = theme.text;
-            itemElement.querySelector('.item-check').classList.remove('hide-element');
-        }
-
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
+        lucide.createIcons();
+        sendResize();
     }
 
-    // Event Listeners
-    selectBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleDropdown();
-    });
+    selectBtn.onclick = (e) => { e.stopPropagation(); toggleDropdown(); };
+    document.onclick = (e) => { if (isOpen && !document.getElementById('dropdown-container').contains(e.target)) closeDropdown(); };
+    ctaBtn.onclick = () => { if (selectedOffer) window.open(selectedOffer.url, '_blank'); };
 
-    document.addEventListener('click', (e) => {
-        if (isOpen && !document.getElementById('dropdown-container').contains(e.target)) {
-            closeDropdown();
-        }
-    });
-
-    ctaBtn.addEventListener('click', () => {
-        if (selectedOffer && selectedOffer.url) {
-            window.open(selectedOffer.url, '_blank');
-        }
-    });
-
-    // Initialize
-    renderDropdown();
-
+    window.onload = () => {
+        renderDropdown();
+        sendResize();
+    };
 </script>
