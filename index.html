@@ -197,7 +197,7 @@
         });
     }
 
-    const observer = new ResizeObserver(() => sendResize());
+    const resizeobserver = new ResizeObserver(() => sendResize());
     observer.observe(document.body);
 
     // Remplissage du menu déroulant
@@ -283,6 +283,15 @@
         renderDropdown(); 
         sendResize(); 
     };
+    const observer = new IntersectionObserver((entries) => {
+entries.forEach(entry => {
+if (entry.isIntersecting) {
+trackTool('tool_visible');
+observer.unobserve(entry.target);
+}
+});
+}, { threshold: 0.5 });
+observer.observe(document.querySelector('.container'));
 </script>
 </body>
 </html>
