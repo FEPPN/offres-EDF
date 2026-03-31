@@ -296,11 +296,16 @@
         }
     };
 
-    // Intersection Observer (Visibilité) - Corrigé
+   // Intersection Observer (Visibilité) - Corrigé en tant qu'événement propre
     const visibilityObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                trackTool('tool_visible'); // Tracking : Outil vu
+                // On envoie directement 'tool_visible' dans la clé 'event'
+                window.parent.postMessage({
+                    'event': 'tool_visible',
+                    'tool_name': 'offres-EDF'
+                }, '*');
+                
                 visibilityObserver.unobserve(entry.target);
             }
         });
@@ -310,10 +315,8 @@
     window.onload = () => { 
         renderDropdown(); 
         sendResize(); 
-        // Lancement de l'observation sur le container principal
         visibilityObserver.observe(document.getElementById('papernest-edf-tool'));
     };
-
 </script>
 </body>
 </html>
